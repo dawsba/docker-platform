@@ -94,43 +94,39 @@ services:
     volumes:
       - ./logs/nginx:/var/log/nginx:cached
       - ./symfony:/var/www/html:cached
-# TBD - CONVERT THE BELOW TO ARMv7 containers
-#  elasticsearch:
-#    container_name: elasticsearch
-#    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
-#    environment:
-#      discovery.type: "single-node"
-#    expose:
-#      - 9200
-#    networks:
-#      elk_stack:
-#        aliases:
-#          - "elasticsearch"
-#  logstash:
-#    container_name: logstash
-#    image: docker.elastic.co/logstash/logstash:7.4.2
-#    depends_on:
-#      - elasticsearch
-#    volumes:
-#      - ./elk/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:cached
-#      - ./elk/logstash/conf.d:/etc/logstash/conf.d:cached
-#      - ./logs/symfony:/var/www/symfony/var/log:cached
-#      - ./logs/nginx:/var/log/nginx:cached
-#    networks:
-#      - elk_stack
-#  kibana:
-#    container_name: kibana
-#    depends_on:
-#      - elasticsearch
-#    image: docker.elastic.co/kibana/kibana:7.4.2
-#    environment:
-#      SERVER_NAME: localhost
-#      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-#    networks:
-#      - elk_stack
-#    expose:
-#      - 81
-#      - 5601
+  elasticsearch:
+    image: armhfbuild/elasticsearch
+    environment:
+      discovery.type: "single-node"
+    expose:
+      - 9200
+    networks:
+      frontend:
+        aliases:
+          - "elasticsearch"
+  logstash:
+    image: armhfbuild/logstash
+    depends_on:
+      - elasticsearch
+    volumes:
+      - ./elk/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:cached
+      - ./elk/logstash/conf.d:/etc/logstash/conf.d:cached
+      - ./logs/symfony:/var/www/symfony/var/log:cached
+      - ./logs/nginx:/var/log/nginx:cached
+    networks:
+      - frontend
+  kibana:
+    depends_on:
+      - elasticsearch
+    image: armhfbuild/kibana
+    environment:
+      SERVER_NAME: localhost
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+    networks:
+      - frontend
+    expose:
+      - 81
+      - 5601
 
 networks:
   frontend:
