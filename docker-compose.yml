@@ -1,0 +1,136 @@
+version: "3.8"
+services:
+  proxy:
+    image: braingamer/nginx-proxy-arm
+    ports:
+      - 80:80
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+    networks:
+      - frontend
+  mysql:
+    image: hypriot/rpi-mysql
+    expose:
+      - 3306
+    volumes:
+      - ./DatabaseRepository:/var/lib/mysql
+    networks:
+      - frontend
+    environment:
+      - MYSQL_DATABASE=${PROJECT_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${PROJECT_MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${PROJECT_MYSQL_USER}
+      - MYSQL_PASSWORD=${PROJECT_MYSQL_PASSWORD}
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+  nginx-php:
+    #image: tobi312/alpine-nginx-php:arm
+    build: 
+      context: ./docker
+      dockerfile: alpine.armhf.Dockerfile
+    image: dawsba/pi-alpine-nginx-php:1.0
+    expose:
+      - 80/tcp
+      - 80/udp
+    #ports:
+    #  - 80:80
+    #  - 443:443
+    networks:
+      - frontend
+    volumes:
+      - ./${PROJECT_PROJECT1_FOLDER}:/var/www/html
+    depends_on:
+      - mysql
+    environment:
+      - VIRTUAL_HOST=${PROJECT_PROJECT1_VHOST}
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+  php-my-admin:
+    image: jackgruber/phpmyadmin
+    expose:
+      - 80
+    depends_on:
+      - mysql
+    networks:
+      - frontend
+    environment:
+      - PMA_HOST=mysql
+      - VIRTUAL_HOST=${PROJECT_PROJECT1_VHOST}
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+  symfony_php:
+    build: ./php-fpm
+    expose:
+      - 9000
+      - 9001
+    volumes:
+      - ./symfony:/var/www/symfony:cached
+      - ./logs/symfony:/var/www/symfony/var/log:cached
+    depends_on:
+      - mysql
+    networks:
+      - frontend
+  symfony_nginx:
+    image: dawsba/pi-alpine-nginx-php:1.0
+    ports:
+      - 82:80
+    expose:
+      - 80
+    depends_on:
+      - symfony_php
+    environment:
+      - VIRTUAL_HOST=${PROJECT_SYMFONY_VHOST}
+    networks:
+      - frontend
+    volumes:
+      - ./logs/nginx:/var/log/nginx:cached
+      - ./symfony:/var/www/html:cached
+# TBD - CONVERT THE BELOW TO ARMv7 containers
+#  elasticsearch:
+#    container_name: elasticsearch
+#    image: docker.elastic.co/elasticsearch/elasticsearch:7.4.2
+#    environment:
+#      discovery.type: "single-node"
+#    expose:
+#      - 9200
+#    networks:
+#      elk_stack:
+#        aliases:
+#          - "elasticsearch"
+#  logstash:
+#    container_name: logstash
+#    image: docker.elastic.co/logstash/logstash:7.4.2
+#    depends_on:
+#      - elasticsearch
+#    volumes:
+#      - ./elk/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:cached
+#      - ./elk/logstash/conf.d:/etc/logstash/conf.d:cached
+#      - ./logs/symfony:/var/www/symfony/var/log:cached
+#      - ./logs/nginx:/var/log/nginx:cached
+#    networks:
+#      - elk_stack
+#  kibana:
+#    container_name: kibana
+#    depends_on:
+#      - elasticsearch
+#    image: docker.elastic.co/kibana/kibana:7.4.2
+#    environment:
+#      SERVER_NAME: localhost
+#      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+#    networks:
+#      - elk_stack
+#    expose:
+#      - 81
+#      - 5601
+
+networks:
+  frontend:
