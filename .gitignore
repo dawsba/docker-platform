@@ -42,6 +42,10 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 # Project Folders
+DatabaseRepository
+devilbox
+elk
+logs
 alpine-nginx-php
 lincstowbars
 ManicMotorcycles
