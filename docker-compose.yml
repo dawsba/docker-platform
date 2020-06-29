@@ -61,7 +61,7 @@ services:
       - frontend
     environment:
       - PMA_HOST=mysql
-      - VIRTUAL_HOST=${PROJECT_PROJECT1_VHOST}
+      - VIRTUAL_HOST=${PROJECT_PROJECT1_PMA}
     deploy:
       restart_policy:
         condition: on-failure
