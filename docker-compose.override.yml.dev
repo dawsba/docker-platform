@@ -1,0 +1,14 @@
+version: "2.4"
+services:
+  proxy:
+    image: braingamer/nginx-proxy-arm
+  mysql:
+    image: mariadb
+  php-my-admin:
+    image: andersonak/php-my-admin
+  elasticsearch:
+    image: elasticsearch:7.8.0
+  logstash:
+    image: logstash
+  kibana:
+    image: kibana
