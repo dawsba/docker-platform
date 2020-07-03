@@ -25,6 +25,8 @@ services:
     extends:
       file: common-services.yml
       service: nginx-php
+    depends_on:
+      - mysql
     volumes:
       - ./${PROJECT_PROJECT1_FOLDER}:/var/www/html
     environment:
@@ -33,6 +35,8 @@ services:
     extends:
       file: common-services.yml
       service: nginx-php
+    depends_on:
+      - mysql
     environment:
       - VIRTUAL_HOST=${PROJECT_CREATIVENEON_VHOST}
     volumes:
@@ -66,6 +70,7 @@ services:
       service: nginx-php
     depends_on:
       - symfony_php
+      - mysql
     environment:
       - VIRTUAL_HOST=${PROJECT_SYMFONY_VHOST}
     volumes:

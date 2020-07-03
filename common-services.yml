@@ -10,5 +10,3 @@ services:
       - 80/udp
     networks:
       - frontend
-    depends_on:
-      - mysql
