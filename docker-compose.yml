@@ -1,4 +1,4 @@
-version: "3.8"
+version: "2.8"
 services:
   proxy:
     image: braingamer/nginx-proxy-arm
@@ -21,11 +21,6 @@ services:
       - MYSQL_ROOT_PASSWORD=${PROJECT_MYSQL_ROOT_PASSWORD}
       - MYSQL_USER=${PROJECT_MYSQL_USER}
       - MYSQL_PASSWORD=${PROJECT_MYSQL_PASSWORD}
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
   nginx-php:
     extends:
       file: common-services.yml
@@ -53,11 +48,6 @@ services:
     environment:
       - PMA_HOST=mysql
       - VIRTUAL_HOST=${PROJECT_PROJECT1_PMA}
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
   symfony_php:
     build: ./php-fpm
     expose:
