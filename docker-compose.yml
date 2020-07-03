@@ -17,7 +17,7 @@ services:
     networks:
       - frontend
     environment:
-      - MYSQL_DATABASE=${PROJECT_DATABASE}
+      - MYSQL_DATABASE=${PROJECT_MYSQL_DATABASE}
       - MYSQL_ROOT_PASSWORD=${PROJECT_MYSQL_ROOT_PASSWORD}
       - MYSQL_USER=${PROJECT_MYSQL_USER}
       - MYSQL_PASSWORD=${PROJECT_MYSQL_PASSWORD}
@@ -27,37 +27,19 @@ services:
         delay: 5s
         max_attempts: 3
   nginx-php:
-    #image: tobi312/alpine-nginx-php:arm
-    build: 
-      context: ./docker
-      dockerfile: alpine.armhf.Dockerfile
-    image: dawsba/pi-alpine-nginx-php:1.0
-    expose:
-      - 80/tcp
-      - 80/udp
-    networks:
-      - frontend
+    extends:
+      file: common-services.yml
+      service: nginx-php
     volumes:
       - ./${PROJECT_PROJECT1_FOLDER}:/var/www/html
-    depends_on:
-      - mysql
     environment:
       - VIRTUAL_HOST=${PROJECT_PROJECT1_VHOST}
-    deploy:
-      restart_policy:
-        condition: on-failure
-        delay: 5s
-        max_attempts: 3
   creativeneon_nginx:
-    image: dawsba/pi-alpine-nginx-php:1.0
-    expose:
-      - 80/tcp
-    depends_on:
-      - mysql
+    extends:
+      file: common-services.yml
+      service: nginx-php
     environment:
       - VIRTUAL_HOST=${PROJECT_CREATIVENEON_VHOST}
-    networks:
-      - frontend
     volumes:
       - ./creativeneon/creativeneon_old/public_html:/var/www/html
   php-my-admin:
@@ -89,17 +71,13 @@ services:
     networks:
       - frontend
   symfony_nginx:
-    image: dawsba/pi-alpine-nginx-php:1.0
-    ports:
-      - 82:80
-    expose:
-      - 80
+    extends:
+      file: common-services.yml
+      service: nginx-php
     depends_on:
       - symfony_php
     environment:
       - VIRTUAL_HOST=${PROJECT_SYMFONY_VHOST}
-    networks:
-      - frontend
     volumes:
       - ./logs/nginx:/var/log/nginx:cached
       - ./symfony:/var/www/html:cached
