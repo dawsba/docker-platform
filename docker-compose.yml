@@ -52,63 +52,63 @@ services:
     environment:
       - PMA_HOST=mysql
       - VIRTUAL_HOST=${PROJECT_PROJECT1_PMA}
-  symfony_php:
-    build: ./php-fpm
-    expose:
-      - 9000
-      - 9001
-    volumes:
-      - ./symfony:/var/www/symfony:cached
-      - ./logs/symfony:/var/www/symfony/var/log:cached
-    depends_on:
-      - mysql
-    networks:
-      - frontend
-  symfony_nginx:
-    extends:
-      file: common-services.yml
-      service: nginx-php
-    depends_on:
-      - symfony_php
-      - mysql
-    environment:
-      - VIRTUAL_HOST=${PROJECT_SYMFONY_VHOST}
-    volumes:
-      - ./logs/nginx:/var/log/nginx:cached
-      - ./symfony:/var/www/html:cached
-  elasticsearch:
-    image: armhfbuild/elasticsearch
-    environment:
-      discovery.type: "single-node"
-    expose:
-      - 9200
-    networks:
-      frontend:
-        aliases:
-          - "elasticsearch"
-  logstash:
-    image: armhfbuild/logstash
-    depends_on:
-      - elasticsearch
-    volumes:
-      - ./elk/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:cached
-      - ./elk/logstash/conf.d:/etc/logstash/conf.d:cached
-      - ./logs/symfony:/var/www/symfony/var/log:cached
-      - ./logs/nginx:/var/log/nginx:cached
-    networks:
-      - frontend
-  kibana:
-    depends_on:
-      - elasticsearch
-    image: armhfbuild/kibana
-    environment:
-      SERVER_NAME: localhost
-      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
-    networks:
-      - frontend
-    expose:
-      - 81
-      - 5601
+#  symfony_php:
+#    build: ./php-fpm
+#    expose:
+#      - 9000
+#      - 9001
+#    volumes:
+#      - ./symfony:/var/www/symfony:cached
+#      - ./logs/symfony:/var/www/symfony/var/log:cached
+#    depends_on:
+#      - mysql
+#    networks:
+#      - frontend
+#  symfony_nginx:
+#    extends:
+#      file: common-services.yml
+#      service: nginx-php
+#    depends_on:
+#      - symfony_php
+#      - mysql
+#    environment:
+#      - VIRTUAL_HOST=${PROJECT_SYMFONY_VHOST}
+#    volumes:
+#      - ./logs/nginx:/var/log/nginx:cached
+#      - ./symfony:/var/www/html:cached
+#  elasticsearch:
+#    image: armhfbuild/elasticsearch
+#    environment:
+#      discovery.type: "single-node"
+#    expose:
+#      - 9200
+#    networks:
+#      frontend:
+#        aliases:
+#          - "elasticsearch"
+#  logstash:
+#    image: armhfbuild/logstash
+#    depends_on:
+#      - elasticsearch
+#    volumes:
+#      - ./elk/logstash/pipelines.yml:/usr/share/logstash/config/pipelines.yml:cached
+#      - ./elk/logstash/conf.d:/etc/logstash/conf.d:cached
+#      - ./logs/symfony:/var/www/symfony/var/log:cached
+#      - ./logs/nginx:/var/log/nginx:cached
+#    networks:
+#      - frontend
+#  kibana:
+#    depends_on:
+#      - elasticsearch
+#    image: armhfbuild/kibana
+#    environment:
+#      SERVER_NAME: localhost
+#      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+#    networks:
+#      - frontend
+#    expose:
+#      - 81
+#      - 5601
 
 networks:
   frontend:
