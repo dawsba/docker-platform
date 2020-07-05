@@ -1,5 +1,10 @@
 version: "2.4"
 services:
+  core-nginx:
+    build:
+      context: ./docker
+      dockerfile: alpine.armhf.Dockerfile
+    image: dawsba/pi-alpine-nginx-php:1.0
   proxy:
     image: braingamer/nginx-proxy-arm
     ports:
@@ -41,6 +46,16 @@ services:
       - VIRTUAL_HOST=${PROJECT_CREATIVENEON_VHOST}
     volumes:
       - ./creativeneon/creativeneon_old/public_html:/var/www/html
+  creativeneon2020_nginx:
+    extends:
+      file: common-services.yml
+      service: nginx-php
+    depends_on:
+      - mysql
+    environment:
+      - VIRTUAL_HOST=${PROJECT_CREATIVENEON2020_VHOST}
+    volumes:
+      - ./creativeneon_2020:/var/www/html
   php-my-admin:
     image: jackgruber/phpmyadmin
     expose:

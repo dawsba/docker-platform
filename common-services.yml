@@ -1,9 +1,6 @@
 version: "2.4"
 services:
   nginx-php:
-    build:
-      context: ./docker
-      dockerfile: alpine.armhf.Dockerfile
     image: dawsba/pi-alpine-nginx-php:1.0
     expose:
       - 80/tcp

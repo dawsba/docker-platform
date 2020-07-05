@@ -17,13 +17,25 @@ ENV WWW_USER=pi
 ENV WWW_USER_UID=1000
 
 # Install
-RUN addgroup -g $WWW_USER_UID -S $WWW_USER && \
+RUN apk update && apk -q upgrade \
+    && addgroup -g $WWW_USER_UID -S $WWW_USER && \
     adduser -D -S -h /var/cache/$WWW_USER -s /sbin/nologin $WWW_USER -G $WWW_USER -u $WWW_USER_UID && \
     addgroup $WWW_USER root && \
     addgroup $WWW_USER adm && \
-	apk add --update --no-cache \
+	apk add --no-cache --update \
 	tzdata \
-	#git wget curl nano zip unzip \
+	git \
+    wget \
+    nano \
+    zip \
+    unzip \
+    file \
+    re2c \
+    autoconf \
+    zlib \
+    zlib-dev \
+    gcc \
+    g++ \
 	supervisor \
 	nginx \
 	coreutils \
@@ -50,6 +62,9 @@ RUN addgroup -g $WWW_USER_UID -S $WWW_USER && \
 	php7-odbc \
 	php7-pdo_mysql \
 	php7-pdo_sqlite \
+	php7-pear \
+	musl-dev \
+	libc-dev \
 	php7-gettext \
 	php7-xmlreader \
 	php7-xmlrpc \
@@ -72,6 +87,9 @@ RUN addgroup -g $WWW_USER_UID -S $WWW_USER && \
     php7-tokenizer \
     php7-simplexml \
     php7-xmlwriter \
+    php7-dev \
+    yaml-dev \
+    php7-pecl-yaml \
 	make \
 	curl \
 	&& mkdir -p /run/nginx \
@@ -95,7 +113,7 @@ RUN addgroup -g $WWW_USER_UID -S $WWW_USER && \
 RUN echo "$(curl -sS https://composer.github.io/installer.sig) -" > composer-setup.php.sig \
 	&& curl -sS https://getcomposer.org/installer | tee composer-setup.php | sha384sum -c composer-setup.php.sig \
 	&& php composer-setup.php && rm composer-setup.php* \
-	&& chmod +x composer.phar && mv composer.phar /usr/bin/composer 
+	&& chmod +x composer.phar && mv composer.phar /usr/bin/composer
 
 # Copy files and folders into image
 COPY config/nginx_default.conf /etc/nginx/conf.d/default.conf
